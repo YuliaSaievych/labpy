@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>{% block title %}My Portfolio{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1>My Portfolio</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('page1') }}">Page 1</a></li>
+                <li><a href="{{ url_for('display_skills') }}">Page 2</a></li>
+                <li><a href="{{ url_for('page3') }}">Page 3</a></li>
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('info') }}">Info</a></li>
+
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+    {% block content %}{% endblock %}
+</main>
+
+
+
+    <footer>
+        <p>&copy; 2023 My Portfolio. All rights reserved.</p>
+        <p>Operating System: {{ os_info }}</p>
+        <p>User Agent: {{ user_agent }}</p>
+        <p>Current Time: {{ current_time }}</p>
+    </footer>
+
+    <!-- Include Bootstrap JS if needed -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <!-- Include your custom scripts -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}User Information{% endblock %}
+
+{% block content %}
+    <style>
+        /* Add your styles here */
+        h2 {
+            color: #3366cc; /* Set the color for h2 heading */
+        }
+
+        p {
+            font-size: 16px; /* Set the font size for paragraphs */
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #393f41; /* Set the background color for buttons */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #20169a; /* Change background color on hover */
+        }
+
+    </style>
+
+    <h2>User Information</h2>
+    <p>Welcome, {{ current_user.id }}!</p>
+
+    <table class="table table-hover">
+        <tr class="table-primary">
+            <td>OS Information</td>
+            <td>{{ data[0] }}</td>
+        </tr>
+        <tr class="table-primary">
+            <td>Current Time</td>
+            <td>{{ data[1] }}</td>
+        </tr>
+        <tr class="table-primary">
+            <td>User Agent</td>
+            <td>{{ data[2] }}</td>
+        </tr>
+    </table>
+
+    <p>User-specific data: {{ user_data }}</p>
+
+    <form method="GET" action="{{ url_for('logout') }}">
+        <button type="submit">Logout</button>
+    </form>
+    <br>
+    <h3>Cookie Management</h3>
+    <form method="POST" action="{{ url_for('info') }}">
+        <label for="key">Key:</label>
+        <input type="text" name="key" required>
+        <label for="value">Value:</label>
+        <input type="text" name="value" required>
+        <label for="expiry_days">Expiry Days (optional):</label>
+        <input type="number" name="expiry_days" min="1" value="1">
+        <button type="submit" name="action" value="add">Add Cookie</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('info') }}">
+        <label for="key">Key to Delete:</label>
+        <input type="text" name="key" required>
+        <button type="submit" name="action" value="delete">Delete Cookie</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('info') }}">
+        <button type="submit" name="action" value="delete_all">Delete All Cookies</button>
+    </form>
+<br>
+    <h3>Current Cookies</h3>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+                <th>Expiry Time</th>
+                <th>Creation Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, value in request.cookies.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                    <td>{{ request.cookies[key].expires }}</td>
+                    <td>{{ request.cookies[key].created }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
