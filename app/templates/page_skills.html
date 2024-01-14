@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Skills{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <section>
+        <h2>My Skills</h2>
+        <ul>
+            {% for skill in skills %}
+                <li>{{ skill }}</li>
+            {% endfor %}
+        </ul>
+        <p>Total Skills: {{ skills_count }}</p>
+    </section>
+{% endblock %}
