@@ -25,6 +25,17 @@
 
     <main>
     {% block content %}{% endblock %}
+
+        {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
 </main>
 
 
@@ -40,5 +51,7 @@
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <!-- Include your custom scripts -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+
 </body>
 </html>

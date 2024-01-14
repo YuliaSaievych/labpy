@@ -5,7 +5,7 @@ import json
 from flask import jsonify
 
 from flask_wtf import FlaskForm
-from wtforms.fields.simple import StringField, SubmitField, PasswordField
+from wtforms.fields.simple import StringField, SubmitField, PasswordField, BooleanField
 from wtforms.validators import DataRequired
 from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -26,7 +26,9 @@ login_manager.login_view = 'login'
 
 
 class User(UserMixin):
-    pass
+    def __init__(self, id):
+        self.id = id
+
 
 
 @login_manager.user_loader
@@ -35,14 +37,14 @@ def user_loader(username):
     if user is None:
         return None
 
-    user_obj = User()
-    user_obj.id = user['username']
+    user_obj = User(id=user['username'])
     return user_obj
 
 
 class LoginForm(FlaskForm):
     username = StringField('Логін', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
+    remember = BooleanField('Remember me')
     submit = SubmitField('Ввійти')
 
     def validate(self):
@@ -59,17 +61,12 @@ class LoginForm(FlaskForm):
         return True
 
     def validate_on_submit(self):
-        return self.is_submitted() and self.validate()
-
-@login_manager.user_loader
-def user_loader(username):
-    user = next((u for u in users if u['username'] == username), None)
-    if user is None:
-        return None
-
-    user_obj = User()
-    user_obj.id = user['username']
-    return user_obj
+        if self.is_submitted() and self.validate():
+            user = User(id=self.username.data)
+            login_user(user, remember=self.remember.data)
+            flash('Login successful', 'success')
+            return True
+        return False
 
 @app.route('/')
 def home():
@@ -109,9 +106,8 @@ def login():
     data = [os.name, datetime.datetime.now(), request.user_agent]
     form = LoginForm()
     if form.validate_on_submit():
-        user = User()
-        user.id = form.username.data
-        login_user(user)
+        login_user(current_user, remember=form.remember.data)
+        flash('Login successful', 'success')
         return redirect(url_for('info'))
     return render_template('login.html', form=form, data=data)
 
@@ -121,6 +117,7 @@ def login():
 def logout():
     user_data = session.pop('user_data', current_user.id)
     logout_user()
+    flash('Logout successful', 'success')
     return redirect(url_for('login', user_data=user_data))
 
 
