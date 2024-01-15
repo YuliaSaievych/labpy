@@ -11,7 +11,9 @@ from flask_login import LoginManager, UserMixin, current_user, logout_user, logi
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-from app import app
+from app import app, db
+from app.form import ToDoForm
+from app.models import ToDo
 
 app.config['SECRET_KEY'] = 'asdasd'
 
@@ -74,6 +76,46 @@ def home():
     user_agent = "Sample User Agent"  # You may use request.user_agent to get the actual user agent
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return render_template('base.html', os_info=os_info, user_agent=user_agent, current_time=current_time)
+
+
+@app.route('/todo', methods=["GET"])
+def todo_page():
+    return "todo_page"
+
+
+@app.route("/todo", methods=["POST"])
+def add_todo():
+    todo_form = ToDoForm()
+    new_todo = ToDo(title=todo_form.title.data, done=False, status="IN_PROGRESS")
+    db.session.add(new_todo)
+    db.session.commit()
+
+    flash('Todo added successfully', 'success')
+
+    return redirect(url_for("todo_page"))
+
+
+@app.route("/todo/<string:id>")
+def delete_todo(id: str):
+    todo = db.get_or_404(ToDo, id)
+    db.session.delete(todo)
+    db.session.commit()
+    flash('Todo deleted successfully', 'success')
+
+    return redirect(url_for("todo_page"))
+
+
+@app.route("/todo/<string:id>/update")
+def update_todo(id: str):
+    todo = db.get_or_404(ToDo, id)
+    todo.done = True
+    todo.status = "UPDATED"
+
+    db.session.commit()
+    flash('Todo updated successfully', 'success')
+
+    return redirect(url_for("todo_page"))
+
 
 @app.route('/page1')
 def page1():
@@ -150,5 +192,7 @@ def info():
             for cookie in request.cookies:
                 response.delete_cookie(cookie)
             return response
+
+
 
     return render_template('info.html', data=data, user_data=user_data)
