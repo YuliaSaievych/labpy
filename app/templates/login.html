@@ -7,38 +7,26 @@
 {% block content %}
     {% from "render_field.html" import render_field %}
 
-
-                <form action="{{ url_for('user.account') }}"
-                      method="post"
-                      class="login-form w-100 bg-white-gradient-revers"
-                      novalidate
-                      enctype="multipart/form-data"
-                >
-                    {{ form.csrf_token }}
-                    <div class="d-flex justify-content-center align-items-center"> {{ form.submit(class="default-submit", tabindex=2) }} </div>
-                </form>
-
-<!--    <div class="container">-->
-<!--        <div class="row justify-content-center">-->
-<!--            <div class="col-md-6">-->
-<!--                <h2 class="text-center mb-4">Login</h2>-->
-<!--                <form action="{{ url_for(login') }}" method="POST" novalidate>-->
-<!--                    form.csrf_token-->
-
-<!--                    <div class="form-group">-->
-<!--                        <label for="username">Username:</label>-->
-<!--                        {{ render_field(form.username(class="form-control", placeholder="Enter your username")) }}-->
-<!--                    </div>-->
-<!--                    <div class="form-group">-->
-<!--                        <label for="password">Password:</label>-->
-<!--                        {{ render_field(form.password(class="form-control", placeholder="Enter your password")) }}-->
-<!--                    </div>-->
-<!--                    <div class="form-group">-->
-<!--                                     {{ render_field(form.remember) }}-->
-<!--                    </div>-->
-<!--                    <button type="submit" class="btn btn-primary btn-block">Login</button>-->
-<!--                </form>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="login-form">
+                    <h2 class="text-center mb-4">Login</h2>
+                    <form action="{{ url_for('login') }}"
+                          class="d-flex justify-content-center flex-column"
+                          method="post"
+                          novalidate
+                    >
+                        {{ form.csrf_token }}
+                        {{ render_field(form.username) }}
+                        {{ render_field(form.password) }}
+                        {{ render_field(form.remember) }}
+                        <div class="d-flex justify-content-center align-items-center mt-3">
+                            {{ form.submit(class="btn btn-primary", tabindex=2) }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
