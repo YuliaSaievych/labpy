@@ -6,7 +6,7 @@ from flask import jsonify
 
 from flask_wtf import FlaskForm
 from wtforms.fields.simple import StringField, SubmitField, PasswordField, BooleanField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Email, EqualTo
 from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -43,11 +43,19 @@ def user_loader(username):
     return user_obj
 
 
+class RegisterForm(FlaskForm):
+    username = StringField('Login', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Sign up')
+
+
 class LoginForm(FlaskForm):
-    username = StringField('Логін', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
+    username = StringField('Login', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember me')
-    submit = SubmitField('Ввійти')
+    submit = SubmitField('Sign in')
 
     def validate(self):
         if not super(LoginForm, self).validate():
@@ -56,8 +64,8 @@ class LoginForm(FlaskForm):
         user = next((u for u in users if u['username'] == self.username.data), None)
 
         if user is None or user['password'] != self.password.data:
-            self.username.errors.append('Неправильний пароль чи логін!')
-            self.password.errors.append('Неправильний пароль чи логін!')
+            self.username.errors.append('Incorrect password or login!')
+            self.password.errors.append('Incorrect password or login!')
             return False
 
         return True
@@ -72,7 +80,7 @@ class LoginForm(FlaskForm):
 
 @app.route('/')
 def home():
-    os_info = os.name  # Adjust based on your use case
+    os_info = os.name
     user_agent = "Sample User Agent"  # You may use request.user_agent to get the actual user agent
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return render_template('base.html', os_info=os_info, user_agent=user_agent, current_time=current_time)
@@ -143,6 +151,17 @@ def display_skills(id=None):
         skills_count = len(my_skills)
         return render_template('page_skills.html', skills=my_skills, skills_count=skills_count)
 
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        flash(f'Account created for {form.username.data}', 'success')
+        return redirect(url_for("login"))
+    return render_template('register.html', form=form, title="Register")
+
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     data = [os.name, datetime.datetime.now(), request.user_agent]
@@ -170,7 +189,6 @@ def info():
     user_data = session.get('user_data', current_user.id)
 
     if request.method == 'POST':
-        # Handling cookie operations
         action = request.form.get('action')
         key = request.form.get('key')
 
@@ -192,7 +210,5 @@ def info():
             for cookie in request.cookies:
                 response.delete_cookie(cookie)
             return response
-
-
 
     return render_template('info.html', data=data, user_data=user_data)

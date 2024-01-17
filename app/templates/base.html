@@ -17,6 +17,8 @@
             <li><a href="{{ url_for('display_skills') }}">Page 2</a></li>
             <li><a href="{{ url_for('page3') }}">Page 3</a></li>
             <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('register') }}">Registration</a></li>
+
             <li><a href="{{ url_for('info') }}">Info</a></li>
 
         </ul>
@@ -24,6 +26,7 @@
 </header>
 
 <main>
+    {% from "render_field.html" import render_field %}
     {% block content %}{% endblock %}
 
     {% with messages = get_flashed_messages() %}
@@ -46,9 +49,7 @@
     <p>Current Time: {{ current_time }}</p>
 </footer>
 
-<!-- Include Bootstrap JS if needed -->
 <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-<!-- Include your custom scripts -->
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 
