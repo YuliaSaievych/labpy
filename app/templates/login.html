@@ -5,6 +5,8 @@
 {% endblock %}
 
 {% block content %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
     {% from "render_field.html" import render_field %}
 
     <div class="container">
