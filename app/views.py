@@ -77,14 +77,6 @@ def users():
     return render_template('users.html', all_users=all_users, user_count=user_count)
 
 
-@app.route('/users')
-@login_required
-def users():
-    all_users = User.query.all()
-    user_count = len(all_users)
-    return render_template('users.html', all_users=all_users, user_count=user_count)
-
-
 @login_manager.user_loader
 def load_user(user_id):
     user = User.query.filter_by(id=user_id).first()
