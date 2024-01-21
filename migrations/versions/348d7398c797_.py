@@ -26,7 +26,7 @@ def upgrade():
     sa.Column('password', sa.String(length=255), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('image_file'),
+    # sa.UniqueConstraint('image_file'),
     sa.UniqueConstraint('username')
     )
     # ### end Alembic commands ###
