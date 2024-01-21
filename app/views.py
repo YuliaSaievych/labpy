@@ -20,7 +20,9 @@ class RegisterForm(FlaskForm):
     username = StringField('Login', validators=[
         DataRequired(),
         Regexp('^[a-zA-Z0-9_-]{3,20}$',
-               message='Username must be 3-20 characters long and can only contain letters, numbers, underscores, and hyphens')
+               message='Username must be 3-20 characters long and can only contain letters, numbers, underscores, and hyphens'),
+        Regexp('^[^_].*[^_-]$',  # Additional regular expression
+               message='Username cannot start or end with underscores or hyphens')
     ])
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
@@ -65,6 +67,14 @@ def home():
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         )
+
+
+@app.route('/users')
+@login_required
+def users():
+    all_users = User.query.all()
+    user_count = len(all_users)
+    return render_template('users.html', all_users=all_users, user_count=user_count)
 
 
 @app.route('/users')
