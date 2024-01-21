@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <h1>Registered Users</h1>
+
+    {% if user_count == 0 %}
+        <p>No registered users.</p>
+    {% else %}
+        <p>Total registered users: {{ user_count }}</p>
+
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+            </tr>
+            {% for user in all_users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}

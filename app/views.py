@@ -1,81 +1,128 @@
-from flask import Flask, render_template, url_for, redirect, request, session, flash
-import os
 import datetime
-import json
-from flask import jsonify
+import os
 
+from flask import Flask, render_template, url_for, redirect, request, session, flash
+from flask import jsonify
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required, login_user
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms.fields.simple import StringField, SubmitField, PasswordField, BooleanField
-from wtforms.validators import DataRequired
-from flask_login import LoginManager, UserMixin, current_user, logout_user, login_required, login_user
-from werkzeug.security import generate_password_hash, check_password_hash
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp
 
-
-from app import app, db
+from app import db
 from app.form import ToDoForm
 from app.models import ToDo
 
+app = Flask(__name__)
 app.config['SECRET_KEY'] = 'asdasd'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 
-# List of skills
+db = SQLAlchemy(app)
+
+bcrypt = Bcrypt(app)
+
 my_skills = ['Python', 'Flask', 'HTML', 'CSS', 'JavaScript', 'SQL']
-
-with open("app/static/js/users.json", "r") as file:
-    users = json.load(file)
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
 
-class User(UserMixin):
-    def __init__(self, id):
-        self.id = id
+class User(db.Model, UserMixin):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(128))
+
+    def set_password(self, password):
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def check_password(self, password):
+        return bcrypt.check_password_hash(self.password, password)
 
 
+class RegisterForm(FlaskForm):
+    username = StringField('Login', validators=[
+        DataRequired(),
+        Regexp('^[a-zA-Z0-9_-]{3,20}$',
+               message='Username must be 3-20 characters long and can only contain letters, numbers, underscores, and hyphens'),
+        Regexp('^[^_].*[^_-]$',  # Additional regular expression
+               message='Username cannot start or end with underscores or hyphens')
+    ])
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Sign up')
 
-@login_manager.user_loader
-def user_loader(username):
-    user = next((u for u in users if u['username'] == username), None)
-    if user is None:
-        return None
+    def validate_username(self, field):
+        if User.query.filter_by(username=field.data).first():
+            raise ValidationError('Username already in use')
 
-    user_obj = User(id=user['username'])
-    return user_obj
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError('Email already registered')
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Логін', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
+    username = StringField('Login', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember me')
-    submit = SubmitField('Ввійти')
+    submit = SubmitField('Sign in')
 
     def validate(self):
         if not super(LoginForm, self).validate():
             return False
 
-        user = next((u for u in users if u['username'] == self.username.data), None)
+        user = User.query.filter_by(username=self.username.data).first()
 
-        if user is None or user['password'] != self.password.data:
-            self.username.errors.append('Неправильний пароль чи логін!')
-            self.password.errors.append('Неправильний пароль чи логін!')
+        if user is None or not user.check_password(self.password.data):
+            self.username.errors.append('Incorrect password or login!')
+            self.password.errors.append('Incorrect password or login!')
             return False
 
         return True
 
     def validate_on_submit(self):
-        if self.is_submitted() and self.validate():
-            user = User(id=self.username.data)
-            login_user(user, remember=self.remember.data)
-            flash('Login successful', 'success')
-            return True
-        return False
+        return self.is_submitted() and self.validate()
+            # user = User.query.filter_by(username=self.username.data).first()
+            # if user is None:
+            #     new_user = User(username=self.username.data, email=self.email.data)
+            #     new_user.set_password(self.password.data)
+            #     db.session.add(new_user)
+            #     db.session.commit()
+            #     login_user(new_user, remember=self.remember.data)
+            #     flash('Registration successful', 'success')
+            #     return True
+            # else:
+            #     flash('Username or email already exists. Please choose another.', 'danger')
+       # return False
+
 
 @app.route('/')
 def home():
-    os_info = os.name  # Adjust based on your use case
-    user_agent = "Sample User Agent"  # You may use request.user_agent to get the actual user agent
+    os_info = os.name
+    user_agent = "Sample User Agent"
     current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return render_template('base.html', os_info=os_info, user_agent=user_agent, current_time=current_time)
+
+
+@app.route('/users')
+@login_required
+def users():
+    all_users = User.query.all()
+    user_count = len(all_users)
+    return render_template('users.html', all_users=all_users, user_count=user_count)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return None
+
+    user_obj = User(id=user.id)
+    return user_obj
 
 
 @app.route('/todo', methods=["GET"])
@@ -121,13 +168,16 @@ def update_todo(id: str):
 def page1():
     return render_template('page1.html')
 
+
 @app.route('/page2')
 def page2():
     return render_template('page2.html')
 
+
 @app.route('/page3')
 def page3():
     return render_template('page3.html')
+
 
 @app.route('/skills')
 @app.route('/skills/<int:id>')
@@ -139,18 +189,43 @@ def display_skills(id=None):
         else:
             return "Invalid skill ID"
     else:
-        # Display all skills and their total count
         skills_count = len(my_skills)
         return render_template('page_skills.html', skills=my_skills, skills_count=skills_count)
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        existing_user = User.query.filter(
+            (User.username == form.username.data) | (User.email == form.email.data)).first()
+        if existing_user:
+            flash('Username or email already exists. Please choose another.', 'danger')
+            return redirect(url_for('register'))
+
+        new_user = User(username=form.username.data, email=form.email.data)
+        new_user.set_password(form.password.data)
+        db.session.add(new_user)
+        db.session.commit()
+        flash(f'Account created for {form.username.data}', 'success')
+        return redirect(url_for("login"))
+    return render_template('register.html', form=form, title="Register")
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     data = [os.name, datetime.datetime.now(), request.user_agent]
     form = LoginForm()
-    if form.validate_on_submit():
-        login_user(current_user, remember=form.remember.data)
+
+    user = User.query.filter_by(username=form.username.data).first()
+    if user and user.check_password(form.password.data):
+        login_user(user, remember=form.remember.data, force=True)
+        db.session.add(user)
+        db.session.commit()
         flash('Login successful', 'success')
         return redirect(url_for('info'))
+    else:
+        flash('Incorrect password or login!', 'danger')
     return render_template('login.html', form=form, data=data)
 
 
@@ -167,10 +242,9 @@ def logout():
 @login_required
 def info():
     data = [os.name, datetime.datetime.now(), request.user_agent]
-    user_data = session.get('user_data', current_user.id)
+    user_data = current_user.id
 
     if request.method == 'POST':
-        # Handling cookie operations
         action = request.form.get('action')
         key = request.form.get('key')
 
@@ -192,7 +266,5 @@ def info():
             for cookie in request.cookies:
                 response.delete_cookie(cookie)
             return response
-
-
 
     return render_template('info.html', data=data, user_data=user_data)
