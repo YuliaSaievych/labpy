@@ -63,7 +63,7 @@
     </form>
     <br>
     <h3>Cookie Management</h3>
-    <form method="POST" action="{{ url_for('info') }}">
+    <form method="POST" action="{{ url_for('account') }}">
         <label for="key">Key:</label>
         <input type="text" name="key" required>
         <label for="value">Value:</label>
@@ -73,13 +73,13 @@
         <button type="submit" name="action" value="add">Add Cookie</button>
     </form>
 
-    <form method="POST" action="{{ url_for('info') }}">
+    <form method="POST" action="{{ url_for('account') }}">
         <label for="key">Key to Delete:</label>
         <input type="text" name="key" required>
         <button type="submit" name="action" value="delete">Delete Cookie</button>
     </form>
 
-    <form method="POST" action="{{ url_for('info') }}">
+    <form method="POST" action="{{ url_for('account') }}">
         <button type="submit" name="action" value="delete_all">Delete All Cookies</button>
     </form>
 <br>

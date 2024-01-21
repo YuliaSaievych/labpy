@@ -60,12 +60,14 @@ class LoginForm(FlaskForm):
     def validate_on_submit(self):
         return self.is_submitted() and self.validate()
 
+
 @app.route('/')
 def home():
     return render_template('base.html',
         os_info=os.name,
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        is_authenticated=current_user.is_authenticated
         )
 
 
@@ -74,7 +76,8 @@ def home():
 def users():
     all_users = User.query.all()
     user_count = len(all_users)
-    return render_template('users.html', all_users=all_users, user_count=user_count)
+    return render_template('users.html', all_users=all_users, user_count=user_count, is_authenticated=current_user.is_authenticated)
+
 
 
 @login_manager.user_loader
@@ -127,33 +130,40 @@ def load_user(user_id):
 #
 
 @app.route('/page1')
+@login_required
 def page1():
     return render_template('page1.html',
         os_info=os.name,
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        is_authenticated=current_user.is_authenticated
         )
 
 
 @app.route('/page2')
+@login_required
 def page2():
     return render_template('page2.html',
         os_info=os.name,
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        is_authenticated=current_user.is_authenticated
         )
 
 
 @app.route('/page3')
+@login_required
 def page3():
     return render_template('page3.html',
         os_info=os.name,
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        is_authenticated=current_user.is_authenticated
         )
 
 
 @app.route('/skills')
+@login_required
 def display_skills(id=None):
     if id is not None:
         if 0 <= id < len(my_skills):
@@ -169,6 +179,7 @@ def display_skills(id=None):
             os_info=os.name,
             user_agent="Sample User Agent",
             current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            is_authenticated=current_user.is_authenticated
             )
 
 
@@ -194,6 +205,7 @@ def register():
         os_info=os.name,
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        is_authenticated=current_user.is_authenticated
         )
 
 
@@ -208,7 +220,7 @@ def login():
         db.session.add(user)
         db.session.commit()
         flash('Login successful', 'success')
-        return redirect(url_for('info'))
+        return redirect(url_for('account'))
     else:
         flash('Incorrect password or login!', 'danger')
     return render_template('login.html',
@@ -217,6 +229,7 @@ def login():
         os_info=os.name,
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        is_authenticated=current_user.is_authenticated
         )
 
 
@@ -229,9 +242,9 @@ def logout():
     return redirect(url_for('login', user_data=user_data))
 
 
-@app.route('/info', methods=['GET', 'POST'])
+@app.route('/account', methods=['GET', 'POST'])
 @login_required
-def info():
+def account():
     data = [os.name, datetime.datetime.now(), request.user_agent]
     user_data = current_user.id
 
@@ -258,10 +271,11 @@ def info():
                 response.delete_cookie(cookie)
             return response
 
-    return render_template('info.html',
+    return render_template('account.html',
         data=data,
         user_data=user_data,
         os_info=os.name,
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        is_authenticated=current_user.is_authenticated
         )
