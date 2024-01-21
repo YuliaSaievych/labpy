@@ -13,13 +13,19 @@
     <nav>
         <ul>
             <li><a href="{{ url_for('home') }}">Home</a></li>
+            {% if is_authenticated %}
             <li><a href="{{ url_for('page1') }}">Page 1</a></li>
             <li><a href="{{ url_for('display_skills') }}">Page 2</a></li>
             <li><a href="{{ url_for('page3') }}">Page 3</a></li>
+            <li><a href="{{ url_for('account') }}">Account</a></li>
+            <li><a href="{{ url_for('users') }}">Users</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+
+            {% else %}
             <li><a href="{{ url_for('login') }}">Login</a></li>
             <li><a href="{{ url_for('register') }}">Registration</a></li>
-            <li><a href="{{ url_for('info') }}">Info</a></li>
-            <li><a href="{{ url_for('users') }}">Users</a></li>
+            {% endif %}
+
 
 
         </ul>
