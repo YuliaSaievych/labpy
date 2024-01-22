@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Change Data{% endblock %}
+
+{% block content %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <h2>Change Data</h2>
+
+    <form method="POST" action="{{ url_for('change_data') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.username.label(class="form-control-label") }}
+            {{ form.username(class="form-control form-control-sm", placeholder="Username") }}
+        </div>
+        <div class="form-group">
+            {{ form.email.label(class="form-control-label") }}
+            {{ form.email(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+            {{ form.profile_picture.label(class="form-control-label") }}
+            {{ form.profile_picture(class="form-control form-control-sm") }}
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Update Account</button>
+    </form>
+    <br>
+
+    <h3>Change Password</h3>
+    <form method="POST" action="{{ url_for('change_data') }}">
+        {{ password_form.hidden_tag() }}
+        <div class="form-group">
+            {{ password_form.new_password.label(class="form-control-label") }}
+            {{ password_form.new_password(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+            {{ password_form.confirm_new_password.label(class="form-control-label") }}
+            {{ password_form.confirm_new_password(class="form-control form-control-lg") }}
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Change Password</button>
+    </form>
+{% endblock %}
