@@ -13,6 +13,7 @@ from app import app, db
 from app.form import UpdateAccountForm, ChangePasswordForm
 from app.models import User
 
+
 my_skills = ['Python', 'Flask', 'HTML', 'CSS', 'JavaScript', 'SQL']
 
 login_manager = LoginManager(app)
