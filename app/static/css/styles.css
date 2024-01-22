@@ -61,6 +61,18 @@ img {
     max-width: 50%;
     height: auto;
     display: block;
-    margin: 20px auto; /* Center the image */
+    margin: 20px auto;
 }
 
+button {
+            padding: 10px;
+            background-color: #393f41;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+button:hover {
+            background-color: #20169a;
+        }

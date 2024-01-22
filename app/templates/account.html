@@ -3,43 +3,29 @@
 {% block title %}User Information{% endblock %}
 
 {% block content %}
-    <style>
-        h2 {
-            color: #3366cc;
-        }
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
-        p {
-            font-size: 16px;
-        }
-
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #393f41;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #20169a;
-        }
-
-    </style>
 
     <h2>User Information</h2>
-    <p>Welcome, {{ current_user.id }}!</p>
+
+    <p>Welcome, {{ current_user.username }}!</p>
+        <p>Email: {{ current_user.email }}</p>
+
+    <div style="display: flex; gap: 25px; allign-items: flex-start">
+        {% if user_data.image_file %}
+            <img style="height: 150px;" src="{{ url_for('static', filename='/images/' + user_data.image_file) }}">
+        {% else %}
+            <p>No profile image available</p><br>
+        {% endif %}
+    <br>
+            <span>Last entry: {{ user_data.last_seen }}</span>
+        </h1>
+    </div>
+
+    <a href="{{ url_for('change_data') }}">
+        <button class="btn btn-secondary my-2 my-sm-0">Edit data</button>
+    </a>
+    <hr>
 
     <table class="table table-hover">
         <tr class="table-primary">
@@ -56,12 +42,11 @@
         </tr>
     </table>
 
-    <p>User-specific data: {{ user_data }}</p>
-
     <form method="GET" action="{{ url_for('logout') }}">
         <button type="submit">Logout</button>
     </form>
     <br>
+    <hr>
     <h3>Cookie Management</h3>
     <form method="POST" action="{{ url_for('account') }}">
         <label for="key">Key:</label>

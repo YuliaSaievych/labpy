@@ -5,10 +5,12 @@ from flask import jsonify
 from flask import render_template, url_for, redirect, request, session, flash
 from flask_login import LoginManager, current_user, logout_user, login_required, login_user
 from flask_wtf import FlaskForm
+from werkzeug.utils import secure_filename
 from wtforms.fields.simple import StringField, SubmitField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp
 
 from app import app, db
+from app.form import UpdateAccountForm, ChangePasswordForm
 from app.models import User
 
 my_skills = ['Python', 'Flask', 'HTML', 'CSS', 'JavaScript', 'SQL']
@@ -80,14 +82,14 @@ def users():
 
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    user = User.query.filter_by(id=user_id).first()
-    if user is None:
-        return None
-
-    user_obj = User(id=user.id)
-    return user_obj
+# @login_manager.user_loader
+# def load_user(user_id):
+#     user = User.query.filter_by(id=user_id).first()
+#     if user is None:
+#         return None
+#
+#     user_obj = User(id=user.id)
+#     return user_obj
 
 #
 # @app.route('/todo', methods=["GET"])
@@ -242,11 +244,60 @@ def logout():
     return redirect(url_for('login', user_data=user_data))
 
 
+@app.route('/change_data', methods=['GET', 'POST'])
+@login_required
+def change_data():
+    account_form = UpdateAccountForm(obj=current_user)
+    password_form = ChangePasswordForm()
+
+    if account_form.validate_on_submit():
+        current_user.username = account_form.username.data
+        current_user.email = account_form.email.data
+        current_user.last_seen = datetime.datetime.now()
+
+        # Check if a new profile picture is provided
+        if account_form.profile_picture.data:
+            # Save the new profile picture
+            profile_picture = account_form.profile_picture.data
+            filename = secure_filename(profile_picture.filename)
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            profile_picture.save(filepath)
+            current_user.image_file = filename
+
+        db.session.commit()
+
+        # Debugging prints
+        print("Updated user data:")
+        print(f"Username: {current_user.username}")
+        print(f"Email: {current_user.email}")
+        print(f"Image File: {current_user.image_file}")
+
+        flash('Your profile is updated!', 'success')
+        return redirect(url_for('account'))
+
+    elif password_form.validate_on_submit():
+        current_user.set_password(password_form.new_password.data)
+        current_user.last_seen = datetime.datetime.now()
+        db.session.commit()
+
+        print("Updated user password")
+
+        flash('Your password is changed!', 'success')
+        return redirect(url_for('account'))
+
+    return render_template('change_data.html', form=account_form, password_form=password_form)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     data = [os.name, datetime.datetime.now(), request.user_agent]
-    user_data = current_user.id
+    user_data = current_user
 
     if request.method == 'POST':
         action = request.form.get('action')
