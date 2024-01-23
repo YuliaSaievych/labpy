@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField
-from wtforms.fields.simple import StringField, SubmitField, TextAreaField, PasswordField
+from wtforms.fields.simple import StringField, SubmitField
 from wtforms.validators import DataRequired, ValidationError, Length, Email, Regexp, EqualTo
+from wtforms.fields.simple import PasswordField
+
 
 from app.models import User
 
@@ -34,9 +36,9 @@ class UpdateAccountForm(FlaskForm):
 
     submit = SubmitField('Update your profile')
 
+
 class ChangePasswordForm(FlaskForm):
-    new_password = PasswordField('New password',
-                                 validators=[Length(min=6, message="Password must be more than 6 characters")])
-    confirm_new_password = PasswordField('Repeat your new password',
-                                         validators=[EqualTo('new_password', message='Passwords must be the same')])
-    submit_change_password = SubmitField('Change your password')
+    old_password = PasswordField('Old password', validators=[DataRequired()])
+    new_password = PasswordField('New password', validators=[Length(min=6, message="Password must be more than 6 characters")])
+    confirm_new_password = PasswordField('Repeat your new password', validators=[EqualTo('new_password', message='Passwords must be the same')])
+    submit_change_password = SubmitField('Change Password')

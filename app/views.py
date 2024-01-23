@@ -1,7 +1,7 @@
 import datetime
 import os
 
-from flask import jsonify
+from flask import jsonify, current_app
 from flask import render_template, url_for, redirect, request, session, flash
 from flask_login import LoginManager, current_user, logout_user, login_required, login_user
 from flask_wtf import FlaskForm
@@ -254,11 +254,10 @@ def change_data():
     if account_form.validate_on_submit():
         current_user.username = account_form.username.data
         current_user.email = account_form.email.data
-        current_user.last_seen = datetime.datetime.now()
+        current_user.last_seen = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Check if a new profile picture is provided
+
         if account_form.profile_picture.data:
-            # Save the new profile picture
             profile_picture = account_form.profile_picture.data
             filename = secure_filename(profile_picture.filename)
             filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
@@ -267,7 +266,6 @@ def change_data():
 
         db.session.commit()
 
-        # Debugging prints
         print("Updated user data:")
         print(f"Username: {current_user.username}")
         print(f"Email: {current_user.email}")

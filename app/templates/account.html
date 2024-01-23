@@ -18,12 +18,11 @@
             <p>No profile image available</p><br>
         {% endif %}
     <br>
-            <span>Last entry: {{ user_data.last_seen }}</span>
         </h1>
     </div>
 
     <a href="{{ url_for('change_data') }}">
-        <button class="btn btn-secondary my-2 my-sm-0">Edit data</button>
+        <button>Edit data</button>
     </a>
     <hr>
 
@@ -88,5 +87,5 @@
                 </tr>
             {% endfor %}
         </tbody>
-    </table>
+    </table><br><br><br><br><br><br><br><br><br><br>
 {% endblock %}
