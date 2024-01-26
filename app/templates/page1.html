@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Page 1{% endblock %}
+
+{% block content %}
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Page 1</title>
+</head>
+<body>
+    <h2>About Me</h2>
+    <p>Welcome to my personal page where I share a bit about myself.</p>
+
+    <h3>Experience</h3>
+    <p>I have experience working with various technologies including Python, Flask, HTML, CSS, and JavaScript.</p>
+
+    <h3>Projects</h3>
+    <ul>
+        <li>Project 1 - Description of project 1.</li>
+        <li>Project 2 - Description of project 2.</li>
+    </ul>
+
+    <h3>Interests</h3>
+    <p>In my free time, I enjoy coding, reading, and exploring new technologies.</p>
+</body>
+</html>
+
+{% endblock %}

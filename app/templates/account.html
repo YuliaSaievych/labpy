@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}User Information{% endblock %}
+
+{% block content %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+
+    <h2>User Information</h2>
+
+    <p>Welcome, {{ current_user.username }}!</p>
+        <p>Email: {{ current_user.email }}</p>
+
+    <div style="display: flex; gap: 25px; allign-items: flex-start">
+        {% if user_data.image_file %}
+            <img style="height: 150px;" src="{{ url_for('static', filename='/images/' + user_data.image_file) }}">
+        {% else %}
+            <p>No profile image available</p><br>
+        {% endif %}
+    <br>
+        </h1>
+    </div>
+
+    <a href="{{ url_for('change_data') }}">
+        <button>Edit data</button>
+    </a>
+    <hr>
+
+    <table class="table table-hover">
+        <tr class="table-primary">
+            <td>OS Information</td>
+            <td>{{ data[0] }}</td>
+        </tr>
+        <tr class="table-primary">
+            <td>Current Time</td>
+            <td>{{ data[1] }}</td>
+        </tr>
+        <tr class="table-primary">
+            <td>User Agent</td>
+            <td>{{ data[2] }}</td>
+        </tr>
+    </table>
+
+    <form method="GET" action="{{ url_for('logout') }}">
+        <button type="submit">Logout</button>
+    </form>
+    <br>
+    <hr>
+    <h3>Cookie Management</h3>
+    <form method="POST" action="{{ url_for('account') }}">
+        <label for="key">Key:</label>
+        <input type="text" name="key" required>
+        <label for="value">Value:</label>
+        <input type="text" name="value" required>
+        <label for="expiry_days">Expiry Days (optional):</label>
+        <input type="number" name="expiry_days" min="1" value="1">
+        <button type="submit" name="action" value="add">Add Cookie</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('account') }}">
+        <label for="key">Key to Delete:</label>
+        <input type="text" name="key" required>
+        <button type="submit" name="action" value="delete">Delete Cookie</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('account') }}">
+        <button type="submit" name="action" value="delete_all">Delete All Cookies</button>
+    </form>
+<br>
+    <h3>Current Cookies</h3>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+                <th>Expiry Time</th>
+                <th>Creation Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, value in request.cookies.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                    <td>{{ request.cookies[key].expires }}</td>
+                    <td>{{ request.cookies[key].created }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table><br><br><br><br><br><br><br><br><br><br>
+{% endblock %}
