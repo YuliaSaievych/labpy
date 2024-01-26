@@ -11,8 +11,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Re
 
 from app import app, db
 from app.form import UpdateAccountForm, ChangePasswordForm
-from app.models import User
-
+from app.models import User, Discipline
 
 my_skills = ['Python', 'Flask', 'HTML', 'CSS', 'JavaScript', 'SQL']
 
@@ -184,6 +183,36 @@ def display_skills(id=None):
             current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             is_authenticated=current_user.is_authenticated
             )
+
+
+@app.route('/discipline', methods=['GET'])
+def discipline():
+    disciplines = Discipline.query.all()
+    return render_template('discipline.html', disciplines=disciplines)
+
+
+@app.route('/add_discipline', methods=['POST'])
+def add_discipline():
+    name = request.form.get('name')
+    credits = request.form.get('credits')
+    teacher = request.form.get('teacher')
+
+    new_discipline = Discipline(name=name, credits=credits, teacher=teacher)
+    db.session.add(new_discipline)
+    db.session.commit()
+
+    return redirect(url_for('discipline'))
+
+
+@app.route('/delete_discipline/<int:id>', methods=['POST'])
+def delete_discipline(id):
+    discipline_to_delete = Discipline.query.get(id)
+
+    if discipline_to_delete:
+        db.session.delete(discipline_to_delete)
+        db.session.commit()
+
+    return redirect(url_for('discipline'))
 
 
 @app.route("/register", methods=["GET", "POST"])
