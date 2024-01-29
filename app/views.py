@@ -62,11 +62,9 @@ def add_todo():
 def update_todo(id: str):
     todo = db.get_or_404(ToDo, id)
 
-    # Create an instance of the update form
     update_form = UpdateTodoForm()
 
     if update_form.validate_on_submit():
-        # Update the todo fields
         todo.title = update_form.title.data
         todo.status = update_form.status.data
         db.session.commit()
