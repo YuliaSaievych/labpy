@@ -7,15 +7,6 @@ from wtforms.fields.simple import PasswordField, StringField, BooleanField
 from app.models import User
 
 
-class ToDoForm(FlaskForm):
-    title = StringField("", validators=[DataRequired(message="This field is required.")])
-    submit = SubmitField("Save")
-
-class UpdateTodoForm(FlaskForm):
-    title = StringField("Title", validators=[DataRequired(message="This field is required.")])
-    status = StringField("Status", validators=[DataRequired(message="This field is required.")])
-    submit = SubmitField('Update')
-
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Ім\'я', validators=[

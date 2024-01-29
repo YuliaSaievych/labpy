@@ -20,7 +20,7 @@
             <li><a href="{{ url_for('account') }}">Account</a></li>
             <li class="right"><a href="{{ url_for('users') }}">Users</a></li>
             <li class="right"><a href="{{ url_for('logout') }}">Logout</a></li>
-            <li class="right"><a href="{{ url_for('todo_page') }}">ToDo</a></li>
+            <li class="right"><a href="{{ url_for('todo.todo_page') }}">ToDo</a></li>
             {% else %}
             <li class="right"><a href="{{ url_for('login') }}">Login</a></li>
             <li class="right"><a href="{{ url_for('register') }}">Registration</a></li>

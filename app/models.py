@@ -1,9 +1,7 @@
 from flask_bcrypt import Bcrypt
 from flask_login import UserMixin
 
-from app import db, app
-
-bcrypt = Bcrypt(app)
+from app import db, bcrypt
 
 class ToDo(db.Model):
     id = db.Column(db.Integer, primary_key=True)

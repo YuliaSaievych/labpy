@@ -9,7 +9,7 @@
             <div class="row container">
                 <form
                     class="row todo-update-part d-flex flex-column align-items-center todo-container"
-                    action="{{ url_for("update_todo", id=todo.id) }}"
+                    action="{{ url_for("todo.update_todo", id=todo.id) }}"
                     method="post"
                     novalidate
                 >
@@ -29,7 +29,7 @@
 
                     <div class="mb-3">
                         {{ update_form.submit(class="btn btn-primary") }}
-                        <a href="{{ url_for('todo_page') }}" class="btn btn-secondary">Cancel</a>
+                        <a href="{{ url_for('todo.todo_page') }}" class="btn btn-secondary">Cancel</a>
                     </div>
                 </form>
             </div>

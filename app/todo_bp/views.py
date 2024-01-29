@@ -1,57 +1,58 @@
-from flask import request
+import platform
+
+from flask import render_template, request, redirect, flash, url_for
+from flask_login import login_required
 
 from app import db
+from . import todo_bp
+from .forms import ToDoForm
 from app.models import ToDo
-from app.todo_bp import todo_bp
+from app.todo_bp.forms import UpdateTodoForm
 
 
-@todo_bp.route("/", methods=["POST"])
-def add():
-    data = request.json
-    todo = ToDo(title=data['title'], description=data['description'], done=data['done'], status=data['status'])
-    db.session.add(todo)
-    db.session.commit()
+@todo_bp.route('/todo', methods=["GET"])
+@login_required
+def todo_page():
+    def base_render(template: str, **context):
+        return render_template(template, about_os=platform.platform(), user_agent_info=request.user_agent.string, **context)
 
-    return to_json(todo), 201
+    return base_render("ToDo.html", todo_list=ToDo.query.all(), todo_form=ToDoForm(), update_form=UpdateTodoForm())
 
+@todo_bp.route("/todo", methods=["POST"])
+@login_required
+def add_todo():
+    todo_form = ToDoForm()
+    if todo_form.validate_on_submit():
+        new_todo = ToDo(title=todo_form.title.data, done=False, status='IN_PROGRESS')
+        db.session.add(new_todo)
+        db.session.commit()
+        flash('Todo added successfully', 'success')
+    return redirect(url_for("todo.todo_page"))
 
-@todo_bp.route("/<int:id>", methods=["PUT"])
-def update(id):
-    data = request.json
-    todo = ToDo.query.get_or_404(id)
-    todo.title = data['title']
-    todo.description = data['description']
-    todo.done = data['done']
-    todo.status = data['status']
+@todo_bp.route("/todo/<string:id>/update", methods=["GET", "POST"])
+@login_required
+def update_todo(id: str):
+    todo = db.get_or_404(ToDo, id)
 
-    db.session.commit()
-    return to_json(todo), 200
+    update_form = UpdateTodoForm()
 
+    if update_form.validate_on_submit():
+        todo.title = update_form.title.data
+        todo.status = update_form.status.data
+        db.session.commit()
+        flash('Todo updated successfully', 'success')
+        return redirect(url_for("todo.todo_page"))
 
-def to_json(todo: ToDo):
-    return {
-        'id': todo.id,
-        'title': todo.title,
-        'description': todo.description,
-        'done': todo.done,
-        'status': todo.status
-    }
-
-
-@todo_bp.route("/<int:id>", methods=["GET"])
-def get(id):
-    todo = ToDo.query.get_or_404(id)
-    return to_json(todo)
+    return render_template("update_todo.html", todo=todo, update_form=update_form)
 
 
-@todo_bp.route("/all", methods=["GET"])
-def get_all():
-    return [to_json(todo) for todo in ToDo.query.all()]
 
-
-@todo_bp.route("/<int:id>", methods=["DELETE"])
-def delete(id):
-    todo = ToDo.query.get_or_404(id)
+@todo_bp.route("/todo/<string:id>/delete", methods=["GET"])
+@login_required
+def delete_todo(id: str):
+    todo = db.get_or_404(ToDo, id)
     db.session.delete(todo)
     db.session.commit()
-    return {'status': 'Deleted'}, 200
+    flash('Todo deleted successfully', 'success')
+
+    return redirect(url_for("todo.todo_page"))

@@ -1,6 +1,5 @@
 import datetime
 import os
-import platform
 
 from app import app, db
 
@@ -8,8 +7,8 @@ from flask import jsonify, current_app, request, session, flash, render_template
 from flask_login import LoginManager, current_user, logout_user, login_user, login_required
 from werkzeug.utils import secure_filename
 
-from app.form import UpdateAccountForm, ChangePasswordForm, ToDoForm, RegisterForm, LoginForm, UpdateTodoForm
-from app.models import User, ToDo
+from app.form import UpdateAccountForm, ChangePasswordForm, RegisterForm, LoginForm
+from app.models import User
 
 
 
@@ -38,52 +37,7 @@ def users():
     return render_template('users.html', all_users=all_users, user_count=user_count, is_authenticated=current_user.is_authenticated)
 
 
-@app.route('/todo', methods=["GET"])
-@login_required
-def todo_page():
-    def base_render(template: str, **context):
-        return render_template(template, about_os=platform.platform(), user_agent_info=request.user_agent.string, **context)
 
-    return base_render("ToDo.html", todo_list=ToDo.query.all(), todo_form=ToDoForm(), update_form=UpdateTodoForm())
-
-@app.route("/todo", methods=["POST"])
-@login_required
-def add_todo():
-    todo_form = ToDoForm()
-    if todo_form.validate_on_submit():
-        new_todo = ToDo(title=todo_form.title.data, done=False, status='IN_PROGRESS')
-        db.session.add(new_todo)
-        db.session.commit()
-        flash('Todo added successfully', 'success')
-    return redirect(url_for("todo_page"))
-
-@app.route("/todo/<string:id>/update", methods=["GET", "POST"])
-@login_required
-def update_todo(id: str):
-    todo = db.get_or_404(ToDo, id)
-
-    update_form = UpdateTodoForm()
-
-    if update_form.validate_on_submit():
-        todo.title = update_form.title.data
-        todo.status = update_form.status.data
-        db.session.commit()
-        flash('Todo updated successfully', 'success')
-        return redirect(url_for("todo_page"))
-
-    return render_template("update_todo.html", todo=todo, update_form=update_form)
-
-
-
-@app.route("/todo/<string:id>/delete", methods=["GET"])
-@login_required
-def delete_todo(id: str):
-    todo = db.get_or_404(ToDo, id)
-    db.session.delete(todo)
-    db.session.commit()
-    flash('Todo deleted successfully', 'success')
-
-    return redirect(url_for("todo_page"))
 
 
 @app.route('/page1')
