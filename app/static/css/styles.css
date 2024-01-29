@@ -25,8 +25,58 @@ nav ul li {
     margin-right: 20px;
 }
 
+nav ul li.left {
+    float: left;
+    margin-right: 20px;
+}
+
+nav ul li.right {
+    float: right;
+    margin-left: 20px;
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.buttons-container a {
+    margin: 10px;
+    text-decoration: none;
+}
+
+.buttons-container button {
+    padding: 25px;
+    font-size: 18px;
+    background-color: #393f41; /* Change the background color as needed */
+    color: #ffffff; /* Change the text color as needed */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.buttons-container button:hover {
+    background-color: #2980b9; /* Change the hover background color as needed */
+}
+
+
 main {
     padding: 20px;
+}
+
+.main-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 20px;
+}
+
+.main {
+    margin-top: 50px;
 }
 
 footer {
@@ -39,6 +89,10 @@ footer {
     width: 100%;
 }
 
+h1 {
+    color: #333;
+}
+
 h2 {
     color: #333;
 }
@@ -48,6 +102,7 @@ h3 {
 }
 
 ul {
+    padding: 0;
     list-style-type: disc;
     margin-left: 20px;
 }
@@ -56,6 +111,13 @@ p {
     line-height: 1.5;
     margin: 20px 0;
 }
+
+li {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
 
 img {
     max-width: 50%;
@@ -76,3 +138,75 @@ button {
 button:hover {
             background-color: #20169a;
         }
+
+.view-details {
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+#details {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    display: none;
+}
+
+ .todo-container {
+            background-color: #e6e6e6; /* Use your preferred color */
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px; /* Set the border-radius to achieve rounded corners */
+            overflow: hidden; /* Optional: Hides any content that might overflow the rounded corners */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+ .todos-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+ .todo-info {
+            flex: 1;
+        }
+
+ .todo-actions {
+            margin-left: 10px;
+        }
+
+.todo-add-part {
+    margin-bottom: 20px;
+}
+
+.todo-table {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.alert {
+    margin-bottom: 0;
+}
+
+.btn {
+    margin-right: 5px;
+}

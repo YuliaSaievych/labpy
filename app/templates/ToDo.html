@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block links %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('todo.static', filename='css/todo-page.css') }}">
+{% endblock %}
+
+{% set status_style_class = {
+    "COMPLETED": "alert-success",
+    "IN_PROGRESS": "alert-secondary"
+} %}
+
+{% from "render_field.html" import render_field %}
+
+{% block content %}
+
+    <div class="main-wrapper">
+        <main class="main container w-50">
+            <div class="row">
+                <h3>To Do</h3>
+            </div>
+            <div class="row container">
+                <div class="row todo-add-part align-items-center">
+                    <form
+                        class="d-flex flex-row"
+                        action="{{ url_for("add_todo") }}"
+                        method="post"
+                        novalidate
+                    >
+                        {{ todo_form.csrf_token }}
+                        {{ render_field(todo_form.title, class="default-input", placeholder="Enter task title here") }}
+                        {{ todo_form.submit(class="default-submit mx-2") }}
+                    </form>
+                </div>
+                <div class="row todo-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Todo item</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for todo in todo_list %}
+                                <tr>
+                                    <th scope="row">{{ todo.id }}</th>
+                                    <td>{{ todo.title }}</td>
+                                    <td>
+                                        <div class="alert {{ status_style_class[todo.status] }}" role="alert">
+                                            {{ todo.status }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for("update_todo", id=todo.id) }}" class="btn btn-success">Update</a>
+                                        <a href="{{ url_for("delete_todo", id=todo.id) }}" class="btn btn-danger ms-1">Delete</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+{% endblock %}

@@ -24,26 +24,6 @@
     <a href="{{ url_for('change_data') }}">
         <button>Edit data</button>
     </a>
-    <hr>
-
-    <table class="table table-hover">
-        <tr class="table-primary">
-            <td>OS Information</td>
-            <td>{{ data[0] }}</td>
-        </tr>
-        <tr class="table-primary">
-            <td>Current Time</td>
-            <td>{{ data[1] }}</td>
-        </tr>
-        <tr class="table-primary">
-            <td>User Agent</td>
-            <td>{{ data[2] }}</td>
-        </tr>
-    </table>
-
-    <form method="GET" action="{{ url_for('logout') }}">
-        <button type="submit">Logout</button>
-    </form>
     <br>
     <hr>
     <h3>Cookie Management</h3>

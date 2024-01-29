@@ -1,67 +1,23 @@
 import datetime
 import os
-
-from flask import jsonify, current_app
-from flask import render_template, url_for, redirect, request, session, flash
-from flask_login import LoginManager, current_user, logout_user, login_required, login_user
-from flask_wtf import FlaskForm
-from werkzeug.utils import secure_filename
-from wtforms.fields.simple import StringField, SubmitField, PasswordField, BooleanField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp
+import platform
 
 from app import app, db
-from app.form import UpdateAccountForm, ChangePasswordForm
-from app.models import User
+
+from flask import jsonify, current_app, request, session, flash, render_template, redirect, url_for
+from flask_login import LoginManager, current_user, logout_user, login_user, login_required
+from werkzeug.utils import secure_filename
+
+from app.form import UpdateAccountForm, ChangePasswordForm, ToDoForm, RegisterForm, LoginForm, UpdateTodoForm
+from app.models import User, ToDo
+
+
 
 
 my_skills = ['Python', 'Flask', 'HTML', 'CSS', 'JavaScript', 'SQL']
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-
-class RegisterForm(FlaskForm):
-    username = StringField('Login', validators=[
-        DataRequired(),
-        Regexp('^[a-zA-Z0-9_-]{3,20}$',
-               message='Username must be 3-20 characters long and can only contain letters, numbers, underscores, and hyphens'),
-        Regexp('^[^_].*[^_-]$',  # Additional regular expression
-               message='Username cannot start or end with underscores or hyphens')
-    ])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Sign up')
-
-    def validate_username(self, field):
-        if User.query.filter_by(username=field.data).first():
-            raise ValidationError('Username already in use')
-
-    def validate_email(self, field):
-        if User.query.filter_by(email=field.data).first():
-            raise ValidationError('Email already registered')
-
-
-class LoginForm(FlaskForm):
-    username = StringField('Login', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember me')
-    submit = SubmitField('Sign in')
-
-    def validate(self):
-        if not super(LoginForm, self).validate():
-            return False
-
-        user = User.query.filter_by(username=self.username.data).first()
-
-        if user is None or not user.check_password(self.password.data):
-            self.username.errors.append('Incorrect password or login!')
-            self.password.errors.append('Incorrect password or login!')
-            return False
-
-        return True
-
-    def validate_on_submit(self):
-        return self.is_submitted() and self.validate()
 
 
 @app.route('/')
@@ -82,88 +38,85 @@ def users():
     return render_template('users.html', all_users=all_users, user_count=user_count, is_authenticated=current_user.is_authenticated)
 
 
+@app.route('/todo', methods=["GET"])
+@login_required
+def todo_page():
+    def base_render(template: str, **context):
+        return render_template(template, about_os=platform.platform(), user_agent_info=request.user_agent.string, **context)
 
-# @login_manager.user_loader
-# def load_user(user_id):
-#     user = User.query.filter_by(id=user_id).first()
-#     if user is None:
-#         return None
-#
-#     user_obj = User(id=user.id)
-#     return user_obj
+    return base_render("ToDo.html", todo_list=ToDo.query.all(), todo_form=ToDoForm(), update_form=UpdateTodoForm())
 
-#
-# @app.route('/todo', methods=["GET"])
-# def todo_page():
-#     return "todo_page"
-#
-#
-# @app.route("/todo", methods=["POST"])
-# def add_todo():
-#     todo_form = ToDoForm()
-#     new_todo = ToDo(title=todo_form.title.data, done=False, status="IN_PROGRESS")
-#     db.session.add(new_todo)
-#     db.session.commit()
-#
-#     flash('Todo added successfully', 'success')
-#
-#     return redirect(url_for("todo_page"))
-#
-#
-# @app.route("/todo/<string:id>")
-# def delete_todo(id: str):
-#     todo = db.get_or_404(ToDo, id)
-#     db.session.delete(todo)
-#     db.session.commit()
-#     flash('Todo deleted successfully', 'success')
-#
-#     return redirect(url_for("todo_page"))
-#
-#
-# @app.route("/todo/<string:id>/update")
-# def update_todo(id: str):
-#     todo = db.get_or_404(ToDo, id)
-#     todo.done = True
-#     todo.status = "UPDATED"
-#
-#     db.session.commit()
-#     flash('Todo updated successfully', 'success')
-#
-#     return redirect(url_for("todo_page"))
-#
+@app.route("/todo", methods=["POST"])
+@login_required
+def add_todo():
+    todo_form = ToDoForm()
+    if todo_form.validate_on_submit():
+        new_todo = ToDo(title=todo_form.title.data, done=False, status='IN_PROGRESS')
+        db.session.add(new_todo)
+        db.session.commit()
+        flash('Todo added successfully', 'success')
+    return redirect(url_for("todo_page"))
+
+@app.route("/todo/<string:id>/update", methods=["GET", "POST"])
+@login_required
+def update_todo(id: str):
+    todo = db.get_or_404(ToDo, id)
+
+    # Create an instance of the update form
+    update_form = UpdateTodoForm()
+
+    if update_form.validate_on_submit():
+        # Update the todo fields
+        todo.title = update_form.title.data
+        todo.status = update_form.status.data
+        db.session.commit()
+        flash('Todo updated successfully', 'success')
+        return redirect(url_for("todo_page"))
+
+    return render_template("update_todo.html", todo=todo, update_form=update_form)
+
+
+
+@app.route("/todo/<string:id>/delete", methods=["GET"])
+@login_required
+def delete_todo(id: str):
+    todo = db.get_or_404(ToDo, id)
+    db.session.delete(todo)
+    db.session.commit()
+    flash('Todo deleted successfully', 'success')
+
+    return redirect(url_for("todo_page"))
+
 
 @app.route('/page1')
 @login_required
 def page1():
-    return render_template('page1.html',
+    return render_account_template('page1.html',
         os_info=os.name,
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         is_authenticated=current_user.is_authenticated
-        )
-
+    )
 
 @app.route('/page2')
 @login_required
 def page2():
-    return render_template('page2.html',
+    return render_account_template('page2.html',
         os_info=os.name,
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         is_authenticated=current_user.is_authenticated
-        )
-
+    )
 
 @app.route('/page3')
 @login_required
 def page3():
-    return render_template('page3.html',
+    return render_account_template('page3.html',
         os_info=os.name,
         user_agent="Sample User Agent",
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         is_authenticated=current_user.is_authenticated
-        )
-
+    )
 
 @app.route('/skills')
 @login_required
@@ -176,14 +129,14 @@ def display_skills(id=None):
             return "Invalid skill ID"
     else:
         skills_count = len(my_skills)
-        return render_template('page_skills.html',
+        return render_account_template('page_skills.html',
             skills=my_skills,
             skills_count=skills_count,
             os_info=os.name,
             user_agent="Sample User Agent",
             current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             is_authenticated=current_user.is_authenticated
-            )
+        )
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -248,6 +201,8 @@ def logout():
 @app.route('/change_data', methods=['GET', 'POST'])
 @login_required
 def change_data():
+    data = [os.name, datetime.datetime.now(), request.user_agent]
+    user_data = current_user
     account_form = UpdateAccountForm(obj=current_user)
     password_form = ChangePasswordForm()
 
@@ -284,7 +239,16 @@ def change_data():
         flash('Your password is changed!', 'success')
         return redirect(url_for('account'))
 
-    return render_template('change_data.html', form=account_form, password_form=password_form)
+    return render_template('change_data.html',
+                           form=account_form,
+                           password_form=password_form,
+                           data=data,
+                           user_data=user_data,
+                           os_info=os.name,
+                           user_agent="Sample User Agent",
+                           current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                           is_authenticated=current_user.is_authenticated
+                           )
 
 
 @login_manager.user_loader
@@ -321,6 +285,8 @@ def account():
                 response.delete_cookie(cookie)
             return response
 
+
+
     return render_template('account.html',
         data=data,
         user_data=user_data,
@@ -329,3 +295,10 @@ def account():
         current_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         is_authenticated=current_user.is_authenticated
         )
+
+
+def render_account_template(template_name, **kwargs):
+    if request.referrer and 'account' in request.referrer:
+        return render_template(template_name, **kwargs)
+    else:
+        return redirect(url_for('account'))
