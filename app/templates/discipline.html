@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <h1>Manage Disciplines</h1>
+
+    <form method="POST" action="{{ url_for('add_discipline') }}">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="credits">Credits:</label>
+        <input type="number" id="credits" name="credits" required>
+
+        <label for="teacher">Teacher:</label>
+        <input type="text" id="teacher" name="teacher">
+
+        <button type="submit">Add Discipline</button>
+    </form>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Credits</th>
+                <th>Teacher</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for discipline in disciplines %}
+                <tr>
+                    <td>{{ discipline.id }}</td>
+                    <td>{{ discipline.name }}</td>
+                    <td>{{ discipline.credits }}</td>
+                    <td>{{ discipline.teacher }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_discipline', id=discipline.id) }}">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endblock %}

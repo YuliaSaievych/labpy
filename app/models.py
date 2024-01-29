@@ -28,3 +28,11 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"User(id={self.id}, username='{self.username}', email='{self.email}', image_file='{self.image_file}')"
+
+
+class Discipline(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    credits = db.Column(db.Integer, nullable=False)
+    teacher = db.Column(db.String(100))
+
