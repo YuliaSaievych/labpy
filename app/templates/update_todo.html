@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="main-wrapper">
+        <main class="main container w-50">
+            <div class="row">
+                <h3>Update Todo</h3>
+            </div>
+            <div class="row container">
+                <form
+                    class="row todo-update-part d-flex flex-column align-items-center todo-container"
+                    action="{{ url_for("update_todo", id=todo.id) }}"
+                    method="post"
+                    novalidate
+                >
+                    {{ update_form.csrf_token }}
+                    <div class="mb-3">
+                        {{ render_field(update_form.title, class="form-control", placeholder="Enter new task title") }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Select task status:</label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="COMPLETED">Completed</option>
+                        </select>
+                    </div>
+
+
+
+                    <div class="mb-3">
+                        {{ update_form.submit(class="btn btn-primary") }}
+                        <a href="{{ url_for('todo_page') }}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+{% endblock %}

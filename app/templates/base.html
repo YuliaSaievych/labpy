@@ -12,19 +12,18 @@
     <h1>My Portfolio</h1>
     <nav>
         <ul>
-            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="left"><a href="{{ url_for('home') }}">Home</a></li>
             {% if is_authenticated %}
-            <li><a href="{{ url_for('page1') }}">Page 1</a></li>
-            <li><a href="{{ url_for('display_skills') }}">Page 2</a></li>
-            <li><a href="{{ url_for('page3') }}">Page 3</a></li>
+            <li class="left"><a href="{{ url_for('page1') }}">About</a></li>
+            <li class="right"><a href="{{ url_for('display_skills') }}">Skills</a></li>
+            <li class="right"><a href="{{ url_for('page3') }}">Scrin</a></li>
             <li><a href="{{ url_for('account') }}">Account</a></li>
-            <li><a href="{{ url_for('users') }}">Users</a></li>
-            <li><a href="{{ url_for('discipline') }}">Discipline</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-
+            <li class="right"><a href="{{ url_for('users') }}">Users</a></li>
+            <li class="right"><a href="{{ url_for('logout') }}">Logout</a></li>
+            <li class="right"><a href="{{ url_for('todo_page') }}">ToDo</a></li>
             {% else %}
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-            <li><a href="{{ url_for('register') }}">Registration</a></li>
+            <li class="right"><a href="{{ url_for('login') }}">Login</a></li>
+            <li class="right"><a href="{{ url_for('register') }}">Registration</a></li>
             {% endif %}
 
 
