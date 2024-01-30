@@ -12,18 +12,18 @@
     <h1>My Portfolio</h1>
     <nav>
         <ul>
-            <li class="left"><a href="{{ url_for('home') }}">Home</a></li>
+            <li class="left"><a href="{{ url_for('general.home') }}">Home</a></li>
             {% if is_authenticated %}
-            <li class="left"><a href="{{ url_for('page1') }}">About</a></li>
-            <li class="right"><a href="{{ url_for('display_skills') }}">Skills</a></li>
-            <li class="right"><a href="{{ url_for('page3') }}">Scrin</a></li>
-            <li><a href="{{ url_for('account') }}">Account</a></li>
-            <li class="right"><a href="{{ url_for('users') }}">Users</a></li>
-            <li class="right"><a href="{{ url_for('logout') }}">Logout</a></li>
-            <li class="right"><a href="{{ url_for('todo_page') }}">ToDo</a></li>
+            <li class="left"><a href="{{ url_for('general.page1') }}">About</a></li>
+            <li class="right"><a href="{{ url_for('general.display_skills') }}">Skills</a></li>
+            <li class="right"><a href="{{ url_for('general.page3') }}">Scrin</a></li>
+            <li><a href="{{ url_for('user.account') }}">Account</a></li>
+            <li class="right"><a href="{{ url_for('user.users') }}">Users</a></li>
+            <li class="right"><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+            <li class="right"><a href="{{ url_for('todo.todo_page') }}">ToDo</a></li>
             {% else %}
-            <li class="right"><a href="{{ url_for('login') }}">Login</a></li>
-            <li class="right"><a href="{{ url_for('register') }}">Registration</a></li>
+            <li class="right"><a href="{{ url_for('auth.login') }}">Login</a></li>
+            <li class="right"><a href="{{ url_for('auth.register') }}">Registration</a></li>
             {% endif %}
 
 

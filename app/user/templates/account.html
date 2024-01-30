@@ -21,13 +21,13 @@
         </h1>
     </div>
 
-    <a href="{{ url_for('change_data') }}">
+    <a href="{{ url_for('user.change_data') }}">
         <button>Edit data</button>
     </a>
     <br>
     <hr>
     <h3>Cookie Management</h3>
-    <form method="POST" action="{{ url_for('account') }}">
+    <form method="POST" action="{{ url_for('user.account') }}">
         <label for="key">Key:</label>
         <input type="text" name="key" required>
         <label for="value">Value:</label>
@@ -37,13 +37,13 @@
         <button type="submit" name="action" value="add">Add Cookie</button>
     </form>
 
-    <form method="POST" action="{{ url_for('account') }}">
+    <form method="POST" action="{{ url_for('user.account') }}">
         <label for="key">Key to Delete:</label>
         <input type="text" name="key" required>
         <button type="submit" name="action" value="delete">Delete Cookie</button>
     </form>
 
-    <form method="POST" action="{{ url_for('account') }}">
+    <form method="POST" action="{{ url_for('user.account') }}">
         <button type="submit" name="action" value="delete_all">Delete All Cookies</button>
     </form>
 <br>

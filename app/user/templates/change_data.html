@@ -23,7 +23,7 @@
     <hr>
 
     <h3>Change Profile Picture</h3>
-    <form method="POST" action="{{ url_for('change_data') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('user.change_data') }}" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.profile_picture.label(class="form-control-label") }}
@@ -36,7 +36,7 @@
     <hr>
 
     <h3>Update User Information</h3>
-    <form method="POST" action="{{ url_for('change_data') }}">
+    <form method="POST" action="{{ url_for('user.change_data') }}">
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.username.label(class="form-control-label") }}
@@ -54,7 +54,7 @@
     <hr>
 
     <h3>Change Password</h3>
-<form method="POST" action="{{ url_for('change_data') }}">
+<form method="POST" action="{{ url_for('user.change_data') }}">
     {{ password_form.hidden_tag() }}
     <div class="form-group">
         {{ password_form.old_password.label(class="form-control-label") }}
