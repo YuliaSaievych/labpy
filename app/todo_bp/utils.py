@@ -1,5 +1,4 @@
 
-
 def to_json(todo):
     return {
         'id': todo.id,

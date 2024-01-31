@@ -10,7 +10,7 @@ from ...todo_bp.utils import to_json
 auth = HTTPBasicAuth()
 
 @todo_api_bp.route("/", methods=["POST"])
-@auth.login_required
+# @auth.login_required
 def add():
     data = request.json
     todo = ToDo(title=data['title'], description=data['description'], done=data['done'], status=data['status'])
@@ -38,7 +38,7 @@ def get(id):
     return to_json(todo)
 
 @todo_api_bp.route("/all", methods=["GET"])
-@auth.login_required
+# @auth.login_required
 def get_all():
     return [to_json(todo) for todo in ToDo.query.all()]
 

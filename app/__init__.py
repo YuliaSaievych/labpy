@@ -1,9 +1,14 @@
+import os
+
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 from config import UPLOAD_FOLDER
+
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -12,7 +17,7 @@ login_manager.login_view = 'auth.login'
 
 # def create_app():
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SECRET_KEY'] = 'asdasd'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['DEBUG'] = True
@@ -22,6 +27,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 bcrypt.init_app(app)
 db.init_app(app)
+migrate = Migrate(app, db)
 login_manager.init_app(app)
 
 
