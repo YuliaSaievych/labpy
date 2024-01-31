@@ -24,6 +24,7 @@ bcrypt.init_app(app)
 db.init_app(app)
 login_manager.init_app(app)
 
+
 from .api import api_bp
 app.register_blueprint(api_bp, url_prefix='/api')
 from .todo_bp import todo_bp
