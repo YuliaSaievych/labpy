@@ -69,3 +69,4 @@ def logout():
     logout_user()
     flash('Logout successful', 'success')
     return redirect(url_for('auth.login', user_data=user_data))
+
